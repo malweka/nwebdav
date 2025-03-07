@@ -18,9 +18,11 @@ public class OptionsHandler : IRequestHandler
 
     public OptionsHandler(IOptions<NWebDavOptions> options)
     {
-        _allowedMethods = string.Join(", ", options.Value.Handlers.Keys);
+        _allowedMethods = string.Join(", ", options.Value.AllowedMethods);
     }
-    
+
+    public string Method => HttpMethods.Options;
+
     /// <summary>
     /// Handle a OPTIONS request.
     /// </summary>

@@ -45,6 +45,9 @@ public class PropFindHandler : IRequestHandler
         _logger = logger;
     }
 
+    public string Method => "PROPFIND";
+
+
     /// <summary>
     /// Handle a PROPFIND request.
     /// </summary>

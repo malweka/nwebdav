@@ -22,7 +22,9 @@ public class PutHandler : IRequestHandler
     {
         _store = store;
     }
-    
+
+    public string Method => HttpMethods.Put;
+
     /// <summary>
     /// Handle a PUT request.
     /// </summary>

@@ -22,7 +22,9 @@ public class MkcolHandler : IRequestHandler
     {
         _store = store;
     }
-    
+
+    public string Method => "MKCOL";
+
     /// <summary>
     /// Handle a MKCOL request.
     /// </summary>

@@ -27,7 +27,9 @@ public class MoveHandler : IRequestHandler
         _xmlReaderWriter = xmlReaderWriter;
         _store = store;
     }
-    
+
+    public string Method => "MOVE";
+
     /// <summary>
     /// Handle a MOVE request.
     /// </summary>

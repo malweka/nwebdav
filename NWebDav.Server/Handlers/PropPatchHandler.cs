@@ -92,6 +92,8 @@ public class PropPatchHandler : IRequestHandler
         _store = store;
     }
 
+    public string Method => "PROPPATCH";
+
     /// <summary>
     /// Handle a PROPPATCH request.
     /// </summary>

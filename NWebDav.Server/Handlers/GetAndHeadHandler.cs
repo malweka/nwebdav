@@ -20,15 +20,23 @@ namespace NWebDav.Server.Handlers;
 /// WebDAV specification
 /// </see>.
 /// </remarks>
-public class GetAndHeadHandler : IRequestHandler
+public abstract class GetAndHeadBaseHandler : IRequestHandler
 {
     private readonly IStore _store;
 
-    public GetAndHeadHandler(IStore store)
+    protected GetAndHeadBaseHandler(IStore store)
     {
         _store = store;
     }
-    
+
+    public abstract string Method { get; }
+
+    public async Task<bool> HandleRequestAsync(HttpContext httpContext)
+    {
+        // Handle the request
+        return await HandleRequestInternalAsync(httpContext).ConfigureAwait(false);
+    }
+
     /// <summary>
     /// Handle a GET or HEAD request.
     /// </summary>
@@ -39,7 +47,7 @@ public class GetAndHeadHandler : IRequestHandler
     /// A task that represents the asynchronous GET or HEAD operation. The
     /// task will always return <see langword="true"/> upon completion.
     /// </returns>
-    public async Task<bool> HandleRequestAsync(HttpContext httpContext)
+    protected virtual async Task<bool> HandleRequestInternalAsync(HttpContext httpContext)
     {
         // Obtain request and response
         var request = httpContext.Request;

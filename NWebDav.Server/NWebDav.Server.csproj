@@ -1,16 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <AssemblyName>NWebDav.Server</AssemblyName>
-    <Title>NWebDav server library</Title>
-    <OutputType>Library</OutputType>
-    <PackageId>NWebDav.Server</PackageId>
-    <Description>NWebDav.Server is a flexible WebDAV server library that can be used to expose files or other data using WebDAV</Description>
-    <PackageTags>C# .NET WebDAV Server</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
-
+	<PropertyGroup>
+		<AssemblyName>NWebDav.Server</AssemblyName>
+		<Title>NWebDav server library</Title>
+		<OutputType>Library</OutputType>
+		<PackageId>NWebDav.Server</PackageId>
+		<Description>NWebDav.Server is a flexible WebDAV server library that can be used to expose files or other data using WebDAV</Description>
+		<PackageTags>C# .NET WebDAV Server</PackageTags>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 </Project>

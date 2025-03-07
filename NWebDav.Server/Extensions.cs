@@ -20,49 +20,36 @@ public static class Extensions
         services
             .AddHttpContextAccessor()
             .AddScoped<IXmlReaderWriter, XmlReaderWriter>()
-            .AddScoped<CopyHandler>()
-            .AddScoped<DeleteHandler>()
-            .AddScoped<GetAndHeadHandler>()
-            .AddScoped<LockHandler>()
-            .AddScoped<MkcolHandler>()
-            .AddScoped<MoveHandler>()
-            .AddScoped<OptionsHandler>()
-            .AddScoped<PropFindHandler>()
-            .AddScoped<PropPatchHandler>()
-            .AddScoped<PutHandler>()
-            .AddScoped<UnlockHandler>()
+            .AddTransient<IHandlerFactory, HandlerFactory>()
             .AddSingleton<ILockingManager, InMemoryLockingManager>();
+
+        var handlerTypes = typeof(GetHandler).Assembly.DefinedTypes.Where(type =>
+            type.ImplementsInterface<IRequestHandler>() && !type.IsAbstract);
+
+        foreach (var handlerType in handlerTypes)
+        {
+            var keyName = handlerType.Name.Replace("Handler", string.Empty).ToUpperInvariant();
+            services.AddKeyedScoped<IRequestHandler>(keyName);
+        }
 
         var optionsBuilder = services
             .AddOptions<NWebDavOptions>()
-            .Validate(o => o.Handlers.All(h => h.Key.ToUpperInvariant() == h.Key), "Handler methods should be uppercase");
+            .BindConfiguration(NWebDavOptions.SectionName);
+        //.Validate(o => o.Handlers.All(h => h.Key.ToUpperInvariant() == h.Key), "Handler methods should be uppercase");
 
-        var methods = new[] { "COPY", "DELETE", "GET", "HEAD", "MKCOL", "MOVE", "OPTIONS", "PROPFIND", "PROPPATCH", "PUT", "UNLOCK" };
-        foreach (var method in methods)
-        {
-            optionsBuilder
-                .Validate(o => o.Handlers.TryGetValue(method, out _), $"No handler for '{method}'")
-                .Validate(o => !o.Handlers.TryGetValue(method, out var handlerType) || typeof(IRequestHandler).IsAssignableFrom(handlerType), $"Handler for '{method}' doesn't implement {nameof(IRequestHandler)}");
-        }
+        //var methods = new[] { "COPY", "DELETE", "GET", "HEAD", "MKCOL", "MOVE", "OPTIONS", "PROPFIND", "PROPPATCH", "PUT", "UNLOCK" };
+        //foreach (var method in methods)
+        //{
+        //    optionsBuilder
+        //        .Validate(o => o.Handlers.TryGetValue(method, out _), $"No handler for '{method}'")
+        //        .Validate(o => !o.Handlers.TryGetValue(method, out var handlerType) || typeof(IRequestHandler).IsAssignableFrom(handlerType), $"Handler for '{method}' doesn't implement {nameof(IRequestHandler)}");
+        //}
 
         services.Configure<NWebDavOptions>(opts =>
         {
-            // TODO: Find out if there is a more suitable way of doing this
-            opts.Handlers["COPY"] = typeof(CopyHandler);
-            opts.Handlers["DELETE"] = typeof(DeleteHandler);
-            opts.Handlers["GET"] = typeof(GetAndHeadHandler);
-            opts.Handlers["HEAD"] = typeof(GetAndHeadHandler);
-            opts.Handlers["LOCK"] = typeof(LockHandler);
-            opts.Handlers["MKCOL"] = typeof(MkcolHandler);
-            opts.Handlers["MOVE"] = typeof(MoveHandler);
-            opts.Handlers["OPTIONS"] = typeof(OptionsHandler);
-            opts.Handlers["PROPFIND"] = typeof(PropFindHandler);
-            opts.Handlers["PROPPATCH"] = typeof(PropPatchHandler);
-            opts.Handlers["PUT"] = typeof(PutHandler);
-            opts.Handlers["UNLOCK"] = typeof(UnlockHandler);
-            configureOptions?.Invoke(opts);                
+            configureOptions?.Invoke(opts);
         });
-        
+
         return services;
     }
 
@@ -96,10 +83,29 @@ public static class BasicAuthenticationExtensions
 {
     public static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder builder)
         => builder.AddBasicAuthentication(BasicAuthenticationDefaults.AuthenticationScheme, null);
-    
+
     public static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder builder, Action<BasicAuthenticationOptions> configureOptions)
         => builder.AddBasicAuthentication(BasicAuthenticationDefaults.AuthenticationScheme, configureOptions);
-    
+
     public static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder builder, string authenticationScheme, Action<BasicAuthenticationOptions>? configureOptions)
         => builder.AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(authenticationScheme, configureOptions);
+}
+
+public static class ReflectionExtensions
+{
+    public static bool ImplementsInterface(this Type type, Type interfaceType)
+    {
+        if (interfaceType.IsGenericType)
+        {
+            var res = type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+            return res;
+        }
+        return interfaceType.IsAssignableFrom(type);
+    }
+
+    public static bool ImplementsInterface<T>(this Type type)
+    {
+        var interfaceType = typeof(T);
+        return ImplementsInterface(type, interfaceType);
+    }
 }

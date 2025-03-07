@@ -29,7 +29,9 @@ public class CopyHandler : IRequestHandler
         _xmlReaderWriter = xmlReaderWriter;
         _store = store;
     }
-    
+
+    public string Method => "COPY";
+
     /// <summary>
     /// Handle a COPY request.
     /// </summary>

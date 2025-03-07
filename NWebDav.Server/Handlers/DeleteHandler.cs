@@ -30,7 +30,9 @@ public class DeleteHandler : IRequestHandler
         _store = store;
         _lockingManager = lockingManager;
     }
-    
+
+    public string Method => HttpMethods.Delete;
+
     /// <summary>
     /// Handle a DELETE request.
     /// </summary>

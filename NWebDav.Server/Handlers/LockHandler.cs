@@ -31,7 +31,9 @@ public class LockHandler : IRequestHandler
         _store = store;
         _lockingManager = lockingManager;
     }
-    
+
+    public string Method => "LOCK";
+
     /// <summary>
     /// Handle a LOCK request.
     /// </summary>

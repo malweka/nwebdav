@@ -38,4 +38,6 @@ public interface IRequestHandler
     /// requester.
     /// </returns>
     Task<bool> HandleRequestAsync(HttpContext httpContext);
+
+    string Method { get; }
 }

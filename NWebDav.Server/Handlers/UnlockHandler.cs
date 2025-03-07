@@ -25,7 +25,9 @@ public class UnlockHandler : IRequestHandler
         _store = store;
         _lockingManager = lockingManager;
     }
-    
+
+    public string Method => "UNLOCK";
+
     /// <summary>
     /// Handle a UNLOCK request.
     /// </summary>

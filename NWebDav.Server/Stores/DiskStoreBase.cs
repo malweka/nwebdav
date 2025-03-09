@@ -4,6 +4,7 @@ using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NWebDav.Server.Helpers;
 
 namespace NWebDav.Server.Stores;
@@ -13,12 +14,16 @@ public abstract class DiskStoreBase : IStore
     private readonly DiskStoreCollectionPropertyManager _diskStoreCollectionPropertyManager;
     private readonly DiskStoreItemPropertyManager _diskStoreItemPropertyManager;
     private readonly ILoggerFactory _loggerFactory;
+    private IOptions<NWebDavOptions> davOptions;
 
-    protected DiskStoreBase(DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, DiskStoreItemPropertyManager diskStoreItemPropertyManager, ILoggerFactory loggerFactory)
+    protected DiskStoreBase( DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, 
+        DiskStoreItemPropertyManager diskStoreItemPropertyManager, 
+        ILoggerFactory loggerFactory, IOptions<NWebDavOptions> davOptions)
     {
         _diskStoreCollectionPropertyManager = diskStoreCollectionPropertyManager;
         _diskStoreItemPropertyManager = diskStoreItemPropertyManager;
         _loggerFactory = loggerFactory;
+        this.davOptions = davOptions;
     }
 
     public abstract bool IsWritable { get; }
@@ -48,6 +53,8 @@ public abstract class DiskStoreBase : IStore
 
     private string GetPathFromUri(Uri uri)
     {
+        uri = UriHelper.RemovePrefix(uri, davOptions.Value.WebDavPathPrefix);
+
         // Determine the path
         var requestedPath = UriHelper.GetDecodedPath(uri)[1..].Replace('/', Path.DirectorySeparatorChar);
 

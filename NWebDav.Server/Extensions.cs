@@ -24,12 +24,12 @@ public static class Extensions
             .AddSingleton<ILockingManager, InMemoryLockingManager>();
 
         var handlerTypes = typeof(GetHandler).Assembly.DefinedTypes.Where(type =>
-            type.ImplementsInterface<IRequestHandler>() && !type.IsAbstract);
+            type.ImplementsInterface<IRequestHandler>() && !type.IsAbstract).ToList();
 
         foreach (var handlerType in handlerTypes)
         {
             var keyName = handlerType.Name.Replace("Handler", string.Empty).ToUpperInvariant();
-            services.AddKeyedScoped<IRequestHandler>(keyName);
+            services.AddKeyedScoped(typeof(IRequestHandler), keyName, handlerType);
         }
 
         var optionsBuilder = services
@@ -74,8 +74,8 @@ public static class Extensions
 
     public static IApplicationBuilder UseNWebDav(this IApplicationBuilder app)
     {
-        var opts = app.ApplicationServices.GetRequiredService<IOptions<NWebDavOptions>>();
-        return app.UseMiddleware<NWebDavMiddleware>(opts);
+        //var opts = app.ApplicationServices.GetRequiredService<IOptions<NWebDavOptions>>();
+        return app.UseMiddleware<NWebDavMiddleware>();
     }
 }
 

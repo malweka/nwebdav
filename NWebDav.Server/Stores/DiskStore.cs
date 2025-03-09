@@ -13,8 +13,8 @@ public sealed class DiskStore : DiskStoreBase
 {
     private readonly IOptions<DiskStoreOptions> _options;
 
-    public DiskStore(IOptions<DiskStoreOptions> options, DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, DiskStoreItemPropertyManager diskStoreItemPropertyManager, ILoggerFactory loggerFactory)
-        : base(diskStoreCollectionPropertyManager, diskStoreItemPropertyManager, loggerFactory)
+    public DiskStore(IOptions<DiskStoreOptions> options, DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, DiskStoreItemPropertyManager diskStoreItemPropertyManager, ILoggerFactory loggerFactory, IOptions<NWebDavOptions> davOptions)
+        : base(diskStoreCollectionPropertyManager, diskStoreItemPropertyManager, loggerFactory, davOptions)
     {
         _options = options;
     }

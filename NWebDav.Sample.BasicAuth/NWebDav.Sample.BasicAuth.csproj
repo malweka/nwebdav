@@ -16,8 +16,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Remove="Properties\launchSettings.json" />
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>

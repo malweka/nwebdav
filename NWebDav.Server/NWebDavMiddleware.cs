@@ -10,7 +10,7 @@ using NWebDav.Server.Handlers;
 
 namespace NWebDav.Server;
 
-internal class NWebDavMiddleware
+public class NWebDavMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<NWebDavMiddleware> _logger;
@@ -33,7 +33,9 @@ internal class NWebDavMiddleware
             await _next(context).ConfigureAwait(false);
             return;
         }
-        
+        if(!context.Items.ContainsKey("NWebDav:Prefix"))
+            context.Items.Add("NWebDav:Prefix", opts.WebDavPathPrefix);
+
         var filter = opts.Filter ?? (ctx => NWebDavOptions.IsAllowed(ctx, opts.AllowedMethods));
 
         if (filter(context))

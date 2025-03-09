@@ -3,6 +3,8 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NWebDav.Server;
 using NWebDav.Server.Stores;
 
 namespace NWebDav.Sample.Kestrel;
@@ -11,7 +13,9 @@ internal sealed class UserDiskStore : DiskStoreBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserDiskStore(IHttpContextAccessor httpContextAccessor, DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, DiskStoreItemPropertyManager diskStoreItemPropertyManager, ILoggerFactory loggerFactory) : base(diskStoreCollectionPropertyManager, diskStoreItemPropertyManager, loggerFactory)
+    public UserDiskStore(IHttpContextAccessor httpContextAccessor, DiskStoreCollectionPropertyManager diskStoreCollectionPropertyManager, 
+        DiskStoreItemPropertyManager diskStoreItemPropertyManager, ILoggerFactory loggerFactory, IOptions<NWebDavOptions> davOptions) 
+        : base(diskStoreCollectionPropertyManager, diskStoreItemPropertyManager, loggerFactory, davOptions)
     {
         _httpContextAccessor = httpContextAccessor;
     }

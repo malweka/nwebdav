@@ -25,4 +25,21 @@ public static class UriHelper
     {
         return uri.LocalPath + Uri.UnescapeDataString(uri.Fragment);
     }
+
+    public static Uri RemovePrefix(Uri uri, string davPrefix)
+    {
+        if (uri == null) throw new ArgumentNullException(nameof(uri));
+        if (string.IsNullOrWhiteSpace(davPrefix)) return uri;
+
+        string prefixWithSlash = "/" + davPrefix.Trim('/');
+        string path = uri.AbsolutePath;
+
+        if (path.StartsWith(prefixWithSlash, StringComparison.OrdinalIgnoreCase))
+        {
+            path = path.Substring(prefixWithSlash.Length);
+        }
+
+        string newUri = uri.GetLeftPart(UriPartial.Authority) + path;
+        return new Uri(newUri);
+    }
 }

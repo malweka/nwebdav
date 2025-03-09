@@ -24,7 +24,7 @@ public record NWebDavOptions
 
     public string[] AllowedMethods { get; init; } = new[] { "COPY", "DELETE", "GET", "HEAD", "MKCOL", "MOVE", "OPTIONS", "PROPFIND", "PROPPATCH", "PUT", "UNLOCK" };
 
-    public string WebDavPathPrefix { get; set; } = "__dav";
+    public string WebDavPathPrefix { get; set; } = "_dav";
 
     /// <summary>
     /// Filter allows to filter incoming HTTP requests. The default filter

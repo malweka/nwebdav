@@ -24,7 +24,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticat
     {
         _logger = loggerFactory.CreateLogger<BasicAuthenticationHandler>();
     }
-    
+
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.IsHttps && !Options.AllowInsecureProtocol)

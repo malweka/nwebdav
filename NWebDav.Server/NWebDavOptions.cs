@@ -26,6 +26,8 @@ public record NWebDavOptions
 
     public string WebDavPathPrefix { get; set; } = "_dav";
 
+    public string AuthenticationScheme { get; set; } = "Basic";
+
     /// <summary>
     /// Filter allows to filter incoming HTTP requests. The default filter
     /// will pass all requests to the NWebDAV middleware.

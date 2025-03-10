@@ -25,27 +25,37 @@ public class NWebDavMiddleware
     {
         var opts = options.Value;
         var requestPath = context.Request.Path.Value ?? string.Empty;
+        var requestMethod = context.Request.Method;
+        var isOptionsRequest = requestMethod == HttpMethods.Options;
 
-        // Check if the path starts with /__dav
+        // Check if the path starts with /_dav
         if (!requestPath.StartsWith($"/{opts.WebDavPathPrefix}", StringComparison.OrdinalIgnoreCase))
         {
             // Not a WebDAV request, pass to next middleware
             await _next(context).ConfigureAwait(false);
             return;
         }
-        if(!context.Items.ContainsKey("NWebDav:Prefix"))
+
+        if (opts.RequireAuthentication && !isOptionsRequest && !(context.User.Identity?.IsAuthenticated ?? false))
+        {
+            await context.ChallengeAsync(opts.AuthenticationScheme).ConfigureAwait(false);
+            return;
+        }
+
+        if (!context.Items.ContainsKey("NWebDav:Prefix"))
             context.Items.Add("NWebDav:Prefix", opts.WebDavPathPrefix);
 
         var filter = opts.Filter ?? (ctx => NWebDavOptions.IsAllowed(ctx, opts.AllowedMethods));
 
         if (filter(context))
         {
-            _logger.LogTrace("Handling request for path '{Path}' with method '{HttpMethod}'.", context.Request.Path, context.Request.Method);
-            var handler = handlerFactory.CreateHandler(context.Request.Method);
+            _logger.LogTrace("Handling request for path '{Path}' with method '{HttpMethod}'.", context.Request.Path, requestMethod);
+            var handler = handlerFactory.CreateHandler(requestMethod);
             if (handler != null)
             {
                 var handled = await handler.HandleRequestAsync(context).ConfigureAwait(false);
-                if (handled) return;
+                if (handled) 
+                    return;
             }
             else
             {
@@ -58,10 +68,10 @@ public class NWebDavMiddleware
                 response.Headers.Append("Allow", supportedMethods);
 
                 // Write message to response body
-                var message = $"The requested method {context.Request.Method} is not implemented on this server.";
+                var message = $"The requested method {requestMethod} is not implemented on this server.";
                 await response.WriteAsync(message);
 
-                _logger.LogTrace("Skipped request, because HTTP method {HttpMethod} has no handler.", context.Request.Method);
+                _logger.LogTrace("Skipped request, because HTTP method {HttpMethod} has no handler.", requestMethod);
 
                 // Important: Return here to prevent calling next middleware
                 return;
@@ -78,7 +88,7 @@ public class NWebDavMiddleware
             response.Headers.Append("Allow", supportedMethods);
 
             // Write message to response body
-            var message = $"The method {context.Request.Method} is not allowed for this resource.";
+            var message = $"The method {requestMethod} is not allowed for this resource.";
             await response.WriteAsync(message);
 
             _logger.LogTrace("Skipped request, because it didn't match the filter.");
